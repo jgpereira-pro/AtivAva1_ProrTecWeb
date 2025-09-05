@@ -27,8 +27,8 @@ public class Usuario {
     @Column(name = "usuario_log_data_criacao")
     private LocalDateTime logDataCriacao;
 
-    @Column(name = "usuario_lod_responsavel_id")
-    private int lodResponsavelId;
+    @Column(name = "usuario_log_responsavel_id")
+    private int logResponsavelId;
 
     public int getId() {
         return id;
@@ -78,11 +78,11 @@ public class Usuario {
         this.logDataCriacao = logDataCriacao;
     }
 
-    public int getLodResponsavelId() {
-        return lodResponsavelId;
+    public int getLogResponsavelId() {
+        return logResponsavelId;
     }
 
-    public void setLodResponsavelId(int lodResponsavelId) {
-        this.lodResponsavelId = lodResponsavelId;
+    public void setLogResponsavelId(int lodResponsavelId) {
+        this.logResponsavelId = lodResponsavelId;
     }
 }

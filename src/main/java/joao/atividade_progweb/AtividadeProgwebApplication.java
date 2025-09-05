@@ -9,5 +9,4 @@ public class AtividadeProgwebApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(AtividadeProgwebApplication.class, args);
 	}
-
 }

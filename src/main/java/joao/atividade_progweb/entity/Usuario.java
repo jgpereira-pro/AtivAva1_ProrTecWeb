@@ -82,7 +82,7 @@ public class Usuario {
         return logResponsavelId;
     }
 
-    public void setLogResponsavelId(int lodResponsavelId) {
-        this.logResponsavelId = lodResponsavelId;
+    public void setLogResponsavelId(int logResponsavelId) {
+        this.logResponsavelId = logResponsavelId;
     }
 }

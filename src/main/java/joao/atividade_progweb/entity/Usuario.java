@@ -2,6 +2,7 @@ package joao.atividade_progweb.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "usuario")
@@ -29,6 +30,17 @@ public class Usuario {
 
     @Column(name = "usuario_log_responsavel_id")
     private int logResponsavelId;
+
+    @OneToMany(mappedBy = "usuario")
+    private List<ReservaAlocacao> reservas;
+
+    public List<ReservaAlocacao> getReservas() {
+        return reservas;
+    }
+
+    public void setReservas(List<ReservaAlocacao> reservas) {
+        this.reservas = reservas;
+    }
 
     public int getId() {
         return id;

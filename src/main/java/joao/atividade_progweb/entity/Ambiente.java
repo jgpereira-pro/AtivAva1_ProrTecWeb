@@ -2,6 +2,8 @@ package joao.atividade_progweb.entity;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "ambiente")
 public class Ambiente {
@@ -28,6 +30,17 @@ public class Ambiente {
 
     @Column(name = "ambiente_status")
     private int status;
+
+    @OneToMany(mappedBy = "ambiente")
+    private List<ReservaAlocacao> reservas;
+
+    public List<ReservaAlocacao> getReservas() {
+        return reservas;
+    }
+
+    public void setReservas(List<ReservaAlocacao> reservas) {
+        this.reservas = reservas;
+    }
 
     public int getId() {
         return id;

@@ -1,14 +1,31 @@
 package joao.atividade_progweb.dto.request;
 
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class ReservaAlocacaoRequestDTO {
+
+    @NotBlank(message = "A justificativa não pode ser vazia.")
     private String justificativa;
+
+    @NotNull(message = "A data não pode ser nula.")
+    @FutureOrPresent(message = "A data da reserva não pode ser no passado.")
     private LocalDate data;
+
+    @NotNull(message = "A hora de início não pode ser nula.")
     private LocalTime horaInicio;
+
+    @NotNull(message = "A hora de fim não pode ser nula.")
     private LocalTime horaFim;
+
+    @NotNull(message = "O ID do usuário é obrigatório.")
     private Integer usuarioId;
+
+    @NotNull(message = "O ID do ambiente é obrigatório.")
     private Integer ambienteId;
 
     public String getJustificativa() {

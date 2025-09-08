@@ -5,7 +5,9 @@ import joao.atividade_progweb.dto.request.UsuarioRequestDTO;
 import joao.atividade_progweb.entity.Usuario;
 import joao.atividade_progweb.repository.UsuarioRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,5 +41,25 @@ public class UsuarioService {
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
 
         return modelMapper.map(usuarioSalvo, UsuarioResponseDTO.class);
+    }
+
+    public UsuarioResponseDTO atualizar(int id, UsuarioRequestDTO usuarioRequestDTO) {
+        Usuario usuarioExistente = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario nao encontrado"));
+
+        modelMapper.map(usuarioRequestDTO, usuarioExistente);
+
+        usuarioExistente.setId(id);
+
+        Usuario usuarioSalvo = usuarioRepository.save(usuarioExistente);
+
+        return modelMapper.map(usuarioSalvo, UsuarioResponseDTO.class);
+    }
+
+    public void deletar(int id) {
+        if (!usuarioRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario nao encontrado");
+        }
+        usuarioRepository.deleteById(id);
     }
 }

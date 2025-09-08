@@ -1,11 +1,13 @@
 package joao.atividade_progweb.service;
 
-import joao.atividade_progweb.dto.response.AmbienteResponseDTO;
 import joao.atividade_progweb.dto.request.AmbienteRequestDTO;
+import joao.atividade_progweb.dto.response.AmbienteResponseDTO;
 import joao.atividade_progweb.entity.Ambiente;
 import joao.atividade_progweb.repository.AmbienteRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -31,9 +33,25 @@ public class AmbienteService {
     public AmbienteResponseDTO salvar(AmbienteRequestDTO ambienteRequestDTO) {
         Ambiente ambiente = modelMapper.map(ambienteRequestDTO, Ambiente.class);
         ambiente.setStatus(1);
-
         Ambiente ambienteSalvo = ambienteRepository.save(ambiente);
-
         return modelMapper.map(ambienteSalvo, AmbienteResponseDTO.class);
+    }
+
+    public AmbienteResponseDTO atualizar(int id, AmbienteRequestDTO ambienteRequestDTO) {
+        Ambiente ambienteExistente = ambienteRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ambiente nao encontrado"));
+
+        modelMapper.map(ambienteRequestDTO, ambienteExistente);
+        ambienteExistente.setId(id);
+
+        Ambiente ambienteSalvo = ambienteRepository.save(ambienteExistente);
+        return modelMapper.map(ambienteSalvo, AmbienteResponseDTO.class);
+    }
+
+    public void deletar(int id) {
+        if (!ambienteRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ambiente nao encontrado");
+        }
+        ambienteRepository.deleteById(id);
     }
 }

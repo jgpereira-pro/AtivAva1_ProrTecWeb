@@ -1,5 +1,6 @@
 package joao.atividade_progweb.controller;
 
+import jakarta.validation.Valid;
 import joao.atividade_progweb.dto.request.AmbienteRequestDTO;
 import joao.atividade_progweb.dto.response.AmbienteResponseDTO;
 import joao.atividade_progweb.entity.Ambiente;
@@ -20,22 +21,22 @@ public class AmbienteController {
     }
 
     @GetMapping("/listar")
-    public List<Ambiente> listarTodos() {
+    public List<AmbienteResponseDTO> listarTodos() {
         return ambienteService.listarTodos();
     }
 
     @GetMapping("/{id}")
-    public Ambiente listarPorId(@PathVariable int id) {
+    public AmbienteResponseDTO listarPorId(@PathVariable int id) {
         return ambienteService.listarPorId(id);
     }
 
     @PostMapping("/criar")
-    public AmbienteResponseDTO criar(@RequestBody AmbienteRequestDTO ambienteRequestDTO) {
+    public AmbienteResponseDTO criar(@Valid @RequestBody AmbienteRequestDTO ambienteRequestDTO) {
         return ambienteService.salvar(ambienteRequestDTO);
     }
 
     @PutMapping("/atualizar/{id}")
-    public AmbienteResponseDTO atualizar(@PathVariable int id, @RequestBody AmbienteRequestDTO ambienteRequestDTO) {
+    public AmbienteResponseDTO atualizar(@PathVariable int id, @Valid @RequestBody AmbienteRequestDTO ambienteRequestDTO) {
         return ambienteService.atualizar(id, ambienteRequestDTO);
     }
 

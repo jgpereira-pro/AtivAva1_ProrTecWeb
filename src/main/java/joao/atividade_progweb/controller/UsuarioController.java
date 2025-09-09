@@ -21,12 +21,13 @@ public class UsuarioController {
     }
 
     @GetMapping("/listar")
-    public List<Usuario> listarTodos() {
+    public List<UsuarioResponseDTO> listarTodos() {
         return usuarioService.listarTodos();
     }
 
+    // --- TIPO DE RETORNO ATUALIZADO ---
     @GetMapping("/{id}")
-    public Usuario listarPorId(@PathVariable int id) {
+    public UsuarioResponseDTO listarPorId(@PathVariable int id) {
         return usuarioService.listarUsuarioPorId(id);
     }
 
@@ -36,7 +37,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/atualizar/{id}")
-    public UsuarioResponseDTO atualizar(@PathVariable int id, @RequestBody UsuarioRequestDTO usuarioRequestDTO) {
+    public UsuarioResponseDTO atualizar(@PathVariable int id, @Valid @RequestBody UsuarioRequestDTO usuarioRequestDTO) {
         return usuarioService.atualizar(id, usuarioRequestDTO);
     }
 

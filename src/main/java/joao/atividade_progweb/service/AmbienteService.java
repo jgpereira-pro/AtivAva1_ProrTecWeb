@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AmbienteService {
@@ -22,12 +23,18 @@ public class AmbienteService {
         this.modelMapper = modelMapper;
     }
 
-    public List<Ambiente> listarTodos() {
-        return ambienteRepository.findAll();
+    public List<AmbienteResponseDTO> listarTodos() {
+        List<Ambiente> ambientes = ambienteRepository.findAll();
+        return ambientes.stream()
+                .map(ambiente -> modelMapper.map(ambiente, AmbienteResponseDTO.class))
+                .collect(Collectors.toList());
     }
 
-    public Ambiente listarPorId(int id) {
-        return ambienteRepository.findById(id).orElse(null);
+    // --- MÉTODO ATUALIZADO ---
+    public AmbienteResponseDTO listarPorId(int id) {
+        Ambiente ambiente = ambienteRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ambiente não encontrado com o ID: " + id));
+        return modelMapper.map(ambiente, AmbienteResponseDTO.class);
     }
 
     public AmbienteResponseDTO salvar(AmbienteRequestDTO ambienteRequestDTO) {

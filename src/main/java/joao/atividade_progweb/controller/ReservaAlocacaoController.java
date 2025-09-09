@@ -6,6 +6,7 @@ import joao.atividade_progweb.entity.ReservaAlocacao;
 import joao.atividade_progweb.service.ReservaAlocacaoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class ReservaAlocacaoController {
     }
 
     @PutMapping("/atualizar/{id}")
-    public ReservaAlocacaoResponseDTO atualizar(@PathVariable int id, @RequestBody ReservaAlocacaoRequestDTO requestDTO) {
+    public ReservaAlocacaoResponseDTO atualizar(@PathVariable int id, @Valid @RequestBody ReservaAlocacaoRequestDTO requestDTO) {
         return reservaService.atualizar(id, requestDTO);
     }
 

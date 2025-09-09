@@ -8,9 +8,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import joao.atividade_progweb.exception.ResourceNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService {
@@ -23,12 +25,19 @@ public class UsuarioService {
         this.modelMapper = modelMapper;
     }
 
-    public List<Usuario> listarTodos() {
-        return usuarioRepository.findAll();
+    public List<UsuarioResponseDTO> listarTodos() {
+        List<Usuario> usuarios = usuarioRepository.findAll();
+        // Usa a Stream API para converter cada Usuario da lista em um UsuarioResponseDTO
+        return usuarios.stream()
+                .map(usuario -> modelMapper.map(usuario, UsuarioResponseDTO.class))
+                .collect(Collectors.toList());
     }
 
-    public Usuario listarUsuarioPorId(int idUsuario){
-        return this.usuarioRepository.findById(idUsuario).orElse(null);
+    public UsuarioResponseDTO listarUsuarioPorId(int idUsuario){
+        Usuario usuario = this.usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o ID: " + idUsuario));
+        // Converte a entidade encontrada para o DTO de resposta
+        return modelMapper.map(usuario, UsuarioResponseDTO.class);
     }
 
     public UsuarioResponseDTO salvar(UsuarioRequestDTO usuarioRequestDTO) {

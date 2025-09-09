@@ -3,6 +3,7 @@ package joao.atividade_progweb.service;
 import joao.atividade_progweb.dto.request.ReservaAlocacaoRequestDTO;
 import joao.atividade_progweb.dto.response.ReservaAlocacaoResponseDTO;
 import joao.atividade_progweb.entity.Ambiente;
+import joao.atividade_progweb.entity.DiasSemAlocacao;
 import joao.atividade_progweb.entity.ReservaAlocacao;
 import joao.atividade_progweb.entity.Usuario;
 import joao.atividade_progweb.repository.AmbienteRepository;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,8 +53,8 @@ public class ReservaAlocacaoService {
     }
 
     public ReservaAlocacaoResponseDTO salvar(ReservaAlocacaoRequestDTO requestDTO) {
+        verificarSeDiaEstaBloqueado(requestDTO.getAmbienteId(), requestDTO.getData());
         validarConflito(requestDTO, 0);
-
 
         Usuario usuario = usuarioRepository.findById(requestDTO.getUsuarioId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!"));
@@ -69,6 +71,7 @@ public class ReservaAlocacaoService {
     }
 
     public ReservaAlocacaoResponseDTO atualizar(int id, ReservaAlocacaoRequestDTO requestDTO) {
+        verificarSeDiaEstaBloqueado(requestDTO.getAmbienteId(), requestDTO.getData());
         validarConflito(requestDTO, id);
 
         return reservaRepository.findById(id).map(reservaExistente -> {
@@ -84,6 +87,13 @@ public class ReservaAlocacaoService {
             ReservaAlocacao reservaSalva = reservaRepository.save(reservaExistente);
             return convertToDto(reservaSalva);
         }).orElse(null);
+    }
+
+    private void verificarSeDiaEstaBloqueado(Integer ambienteId, LocalDate data) {
+        List<DiasSemAlocacao> bloqueios = diasSemAlocacaoRepository.findByAmbienteIdAndData(ambienteId, data);
+        if (!bloqueios.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "O ambiente está bloqueado para alocação nesta data.");
+        }
     }
 
     public boolean deletar(int id) {

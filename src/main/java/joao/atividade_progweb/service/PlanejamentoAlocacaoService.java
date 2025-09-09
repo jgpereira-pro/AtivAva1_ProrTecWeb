@@ -25,13 +25,14 @@ public class PlanejamentoAlocacaoService {
     private final UsuarioRepository usuarioRepository;
     private final AmbienteRepository ambienteRepository;
     private final ModelMapper modelMapper;
-    private DiasSemAlocacaoRepository diasSemAlocacaoRepository;
+    private final DiasSemAlocacaoRepository diasSemAlocacaoRepository;
 
-    public PlanejamentoAlocacaoService(PlanejamentoAlocacaoRepository planejamentoRepository, UsuarioRepository usuarioRepository, AmbienteRepository ambienteRepository, ModelMapper modelMapper) {
+    public PlanejamentoAlocacaoService(PlanejamentoAlocacaoRepository planejamentoRepository, UsuarioRepository usuarioRepository, AmbienteRepository ambienteRepository, ModelMapper modelMapper, DiasSemAlocacaoRepository diasSemAlocacaoRepository) {
         this.planejamentoRepository = planejamentoRepository;
         this.usuarioRepository = usuarioRepository;
         this.ambienteRepository = ambienteRepository;
         this.modelMapper = modelMapper;
+        this.diasSemAlocacaoRepository = diasSemAlocacaoRepository;
     }
 
     public PlanejamentoAlocacaoResponseDTO salvar(PlanejamentoAlocacaoRequestDTO requestDTO) {

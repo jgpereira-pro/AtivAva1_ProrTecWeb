@@ -43,7 +43,7 @@ public class UsuarioService {
             modelMapper.map(usuarioRequestDTO, usuarioExistente);
             Usuario usuarioSalvo = usuarioRepository.save(usuarioExistente);
             return modelMapper.map(usuarioSalvo, UsuarioResponseDTO.class);
-        }).orElse(null); // Se não existe, retorna null
+        }).orElse(null);
     }
 
     public boolean deletar(int id) {

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ReservaAlocacaoService {
@@ -31,25 +30,6 @@ public class ReservaAlocacaoService {
         this.modelMapper = modelMapper;
     }
 
-    public List<ReservaAlocacao> listarTodas() {
-        return reservaRepository.findAll();
-    }
-
-    public List<ReservaAlocacaoResponseDTO> listarPorUsuario(Integer usuarioId) {
-        List<ReservaAlocacao> reservas = reservaRepository.findByUsuarioId(usuarioId);
-        return reservas.stream()
-                .map(reserva -> {
-                    ReservaAlocacaoResponseDTO dto = modelMapper.map(reserva, ReservaAlocacaoResponseDTO.class);
-                    dto.setNomeUsuario(reserva.getUsuario().getNome());
-                    return dto;
-                })
-                .collect(Collectors.toList());
-    }
-
-    public List<ReservaAlocacao> listarPorAmbiente(Integer ambienteId) {
-        return reservaRepository.findByAmbienteId(ambienteId);
-    }
-
     public ReservaAlocacaoResponseDTO salvar(ReservaAlocacaoRequestDTO requestDTO) {
         validarConflito(requestDTO, 0);
 
@@ -62,24 +42,9 @@ public class ReservaAlocacaoService {
         reserva.setUsuario(usuario);
         reserva.setAmbiente(ambiente);
         reserva.setStatus(1);
+
         ReservaAlocacao reservaSalva = reservaRepository.save(reserva);
-        ReservaAlocacaoResponseDTO responseDTO = modelMapper.map(reservaSalva, ReservaAlocacaoResponseDTO.class);
-        responseDTO.setNomeUsuario(reservaSalva.getUsuario().getNome());
-        return responseDTO;
-    }
-
-    public ReservaAlocacaoResponseDTO atualizar(int id, ReservaAlocacaoRequestDTO requestDTO) {
-        validarConflito(requestDTO, id);
-
-        ReservaAlocacao reservaExistente = reservaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva não encontrada"));
-
-        modelMapper.map(requestDTO, reservaExistente);
-        reservaExistente.setId(id);
-        ReservaAlocacao reservaSalva = reservaRepository.save(reservaExistente);
-        ReservaAlocacaoResponseDTO responseDTO = modelMapper.map(reservaSalva, ReservaAlocacaoResponseDTO.class);
-        responseDTO.setNomeUsuario(reservaSalva.getUsuario().getNome());
-        return responseDTO;
+        return convertToDto(reservaSalva);
     }
 
     private void validarConflito(ReservaAlocacaoRequestDTO requestDTO, int idDaReservaParaIgnorar) {
@@ -96,12 +61,20 @@ public class ReservaAlocacaoService {
         }
     }
 
-    public void deletar(int id) {
-        if (!reservaRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva nao encontrada");
+    private ReservaAlocacaoResponseDTO convertToDto(ReservaAlocacao reserva) {
+        ReservaAlocacaoResponseDTO dto = modelMapper.map(reserva, ReservaAlocacaoResponseDTO.class);
+        if (reserva.getUsuario() != null) {
+            dto.setNomeUsuario(reserva.getUsuario().getNome());
         }
-        reservaRepository.deleteById(id);
+        return dto;
     }
 
+    public boolean deletar(int id) {
+        if (reservaRepository.existsById(id)) {
+            reservaRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
 
 }

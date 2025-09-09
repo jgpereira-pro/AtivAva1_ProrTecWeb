@@ -21,13 +21,17 @@ public class AmbienteController {
     }
 
     @GetMapping("/listar")
-    public List<AmbienteResponseDTO> listarTodos() {
+    public List<Ambiente> listarTodos() {
         return ambienteService.listarTodos();
     }
 
     @GetMapping("/{id}")
-    public AmbienteResponseDTO listarPorId(@PathVariable int id) {
-        return ambienteService.listarPorId(id);
+    public ResponseEntity<Ambiente> listarPorId(@PathVariable int id) {
+        Ambiente ambiente = ambienteService.listarPorId(id);
+        if (ambiente != null) {
+            return ResponseEntity.ok(ambiente);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping("/criar")
@@ -36,13 +40,19 @@ public class AmbienteController {
     }
 
     @PutMapping("/atualizar/{id}")
-    public AmbienteResponseDTO atualizar(@PathVariable int id, @Valid @RequestBody AmbienteRequestDTO ambienteRequestDTO) {
-        return ambienteService.atualizar(id, ambienteRequestDTO);
+    public ResponseEntity<AmbienteResponseDTO> atualizar(@PathVariable int id, @Valid @RequestBody AmbienteRequestDTO ambienteRequestDTO) {
+        AmbienteResponseDTO dto = ambienteService.atualizar(id, ambienteRequestDTO);
+        if (dto != null) {
+            return ResponseEntity.ok(dto);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/deletar/{id}")
     public ResponseEntity<Void> deletar(@PathVariable int id) {
-        ambienteService.deletar(id);
-        return ResponseEntity.noContent().build();
+        if (ambienteService.deletar(id)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

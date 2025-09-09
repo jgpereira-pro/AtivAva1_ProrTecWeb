@@ -21,14 +21,17 @@ public class UsuarioController {
     }
 
     @GetMapping("/listar")
-    public List<UsuarioResponseDTO> listarTodos() {
+    public List<Usuario> listarTodos() {
         return usuarioService.listarTodos();
     }
 
-    // --- TIPO DE RETORNO ATUALIZADO ---
     @GetMapping("/{id}")
-    public UsuarioResponseDTO listarPorId(@PathVariable int id) {
-        return usuarioService.listarUsuarioPorId(id);
+    public ResponseEntity<Usuario> listarPorId(@PathVariable int id) {
+        Usuario usuario = usuarioService.listarUsuarioPorId(id);
+        if (usuario != null) {
+            return ResponseEntity.ok(usuario);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping("/criar")
@@ -37,13 +40,19 @@ public class UsuarioController {
     }
 
     @PutMapping("/atualizar/{id}")
-    public UsuarioResponseDTO atualizar(@PathVariable int id, @Valid @RequestBody UsuarioRequestDTO usuarioRequestDTO) {
-        return usuarioService.atualizar(id, usuarioRequestDTO);
+    public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable int id, @Valid @RequestBody UsuarioRequestDTO usuarioRequestDTO) {
+        UsuarioResponseDTO dto = usuarioService.atualizar(id, usuarioRequestDTO);
+        if (dto != null) {
+            return ResponseEntity.ok(dto);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/deletar/{id}")
     public ResponseEntity<Void> deletar(@PathVariable int id) {
-        usuarioService.deletar(id);
-        return ResponseEntity.noContent().build();
+        if (usuarioService.deletar(id)) {
+            return ResponseEntity.noContent().build(); // Sucesso 204
+        }
+        return ResponseEntity.notFound().build(); // Erro 404
     }
 }

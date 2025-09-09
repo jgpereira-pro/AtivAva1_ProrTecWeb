@@ -23,18 +23,12 @@ public class AmbienteService {
         this.modelMapper = modelMapper;
     }
 
-    public List<AmbienteResponseDTO> listarTodos() {
-        List<Ambiente> ambientes = ambienteRepository.findAll();
-        return ambientes.stream()
-                .map(ambiente -> modelMapper.map(ambiente, AmbienteResponseDTO.class))
-                .collect(Collectors.toList());
+    public List<Ambiente> listarTodos() {
+        return ambienteRepository.findAll();
     }
 
-    // --- MÉTODO ATUALIZADO ---
-    public AmbienteResponseDTO listarPorId(int id) {
-        Ambiente ambiente = ambienteRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Ambiente não encontrado com o ID: " + id));
-        return modelMapper.map(ambiente, AmbienteResponseDTO.class);
+    public Ambiente listarPorId(int id) {
+        return ambienteRepository.findById(id).orElse(null);
     }
 
     public AmbienteResponseDTO salvar(AmbienteRequestDTO ambienteRequestDTO) {
@@ -45,20 +39,18 @@ public class AmbienteService {
     }
 
     public AmbienteResponseDTO atualizar(int id, AmbienteRequestDTO ambienteRequestDTO) {
-        Ambiente ambienteExistente = ambienteRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ambiente nao encontrado"));
-
-        modelMapper.map(ambienteRequestDTO, ambienteExistente);
-        ambienteExistente.setId(id);
-
-        Ambiente ambienteSalvo = ambienteRepository.save(ambienteExistente);
-        return modelMapper.map(ambienteSalvo, AmbienteResponseDTO.class);
+        return ambienteRepository.findById(id).map(ambienteExistente -> {
+            modelMapper.map(ambienteRequestDTO, ambienteExistente);
+            Ambiente ambienteSalvo = ambienteRepository.save(ambienteExistente);
+            return modelMapper.map(ambienteSalvo, AmbienteResponseDTO.class);
+        }).orElse(null);
     }
 
-    public void deletar(int id) {
-        if (!ambienteRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ambiente nao encontrado");
+    public boolean deletar(int id) {
+        if (ambienteRepository.existsById(id)) {
+            ambienteRepository.deleteById(id);
+            return true;
         }
-        ambienteRepository.deleteById(id);
+        return false;
     }
 }

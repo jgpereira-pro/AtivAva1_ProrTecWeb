@@ -30,25 +30,33 @@ public class ReservaAlocacaoController {
         return reservaService.salvar(requestDTO);
     }
 
+    // Continua retornando DTO, pois é uma consulta mais específica
     @GetMapping("/usuario/{usuarioId}")
     public List<ReservaAlocacaoResponseDTO> listarPorUsuario(@PathVariable Integer usuarioId) {
         return reservaService.listarPorUsuario(usuarioId);
     }
 
+    // Retorna a lista de entidades
     @GetMapping("/ambiente/{ambienteId}")
     public List<ReservaAlocacao> listarPorAmbiente(@PathVariable Integer ambienteId) {
         return reservaService.listarPorAmbiente(ambienteId);
     }
 
     @PutMapping("/atualizar/{id}")
-    public ReservaAlocacaoResponseDTO atualizar(@PathVariable int id, @Valid @RequestBody ReservaAlocacaoRequestDTO requestDTO) {
-        return reservaService.atualizar(id, requestDTO);
+    public ResponseEntity<ReservaAlocacaoResponseDTO> atualizar(@PathVariable int id, @Valid @RequestBody ReservaAlocacaoRequestDTO requestDTO) {
+        ReservaAlocacaoResponseDTO dto = reservaService.atualizar(id, requestDTO);
+        if (dto != null) {
+            return ResponseEntity.ok(dto);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/deletar/{id}")
     public ResponseEntity<Void> deletar(@PathVariable int id) {
-        reservaService.deletar(id);
-        return ResponseEntity.noContent().build();
+        if (reservaService.deletar(id)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
 }

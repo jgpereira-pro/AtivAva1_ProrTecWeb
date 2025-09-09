@@ -6,6 +6,7 @@ import joao.atividade_progweb.entity.Ambiente;
 import joao.atividade_progweb.entity.ReservaAlocacao;
 import joao.atividade_progweb.entity.Usuario;
 import joao.atividade_progweb.repository.AmbienteRepository;
+import joao.atividade_progweb.repository.DiasSemAlocacaoRepository;
 import joao.atividade_progweb.repository.ReservaAlocacaoRepository;
 import joao.atividade_progweb.repository.UsuarioRepository;
 import org.modelmapper.ModelMapper;
@@ -23,12 +24,15 @@ public class ReservaAlocacaoService {
     private final UsuarioRepository usuarioRepository;
     private final AmbienteRepository ambienteRepository;
     private final ModelMapper modelMapper;
+    private final DiasSemAlocacaoRepository diasSemAlocacaoRepository;
 
-    public ReservaAlocacaoService(ReservaAlocacaoRepository reservaRepository, UsuarioRepository usuarioRepository, AmbienteRepository ambienteRepository, ModelMapper modelMapper) {
+
+    public ReservaAlocacaoService(ReservaAlocacaoRepository reservaRepository, UsuarioRepository usuarioRepository, AmbienteRepository ambienteRepository, ModelMapper modelMapper, DiasSemAlocacaoRepository diasSemAlocacaoRepository) {
         this.reservaRepository = reservaRepository;
         this.usuarioRepository = usuarioRepository;
         this.ambienteRepository = ambienteRepository;
         this.modelMapper = modelMapper;
+        this.diasSemAlocacaoRepository = diasSemAlocacaoRepository;
     }
 
     public List<ReservaAlocacao> listarTodas() {
@@ -48,6 +52,7 @@ public class ReservaAlocacaoService {
 
     public ReservaAlocacaoResponseDTO salvar(ReservaAlocacaoRequestDTO requestDTO) {
         validarConflito(requestDTO, 0);
+
 
         Usuario usuario = usuarioRepository.findById(requestDTO.getUsuarioId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!"));

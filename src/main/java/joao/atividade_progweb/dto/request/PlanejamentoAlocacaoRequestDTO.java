@@ -8,7 +8,7 @@ import java.time.LocalTime;
 
 public class PlanejamentoAlocacaoRequestDTO {
 
-    @NotBlank(message = "A observação не pode ser vazia.")
+    @NotBlank(message = "A observação não pode ser vazia.")
     private String observacao;
 
     @NotNull(message = "A data não pode ser nula.")

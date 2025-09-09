@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PlanejamentoAlocacaoService {
@@ -44,13 +43,48 @@ public class PlanejamentoAlocacaoService {
 
         PlanejamentoAlocacao planejamentoSalvo = planejamentoRepository.save(planejamento);
 
-        return convertToDto(planejamentoSalvo);
+        PlanejamentoAlocacaoResponseDTO responseDTO = modelMapper.map(planejamentoSalvo, PlanejamentoAlocacaoResponseDTO.class);
+        responseDTO.setNomeUsuario(planejamentoSalvo.getUsuario().getNome());
+        return responseDTO;
+    }
+
+    public List<PlanejamentoAlocacao> listarTodos() {
+        return planejamentoRepository.findAll();
+    }
+
+    public PlanejamentoAlocacaoResponseDTO listarPorId(int id) {
+        return planejamentoRepository.findById(id)
+                .map(this::convertToDto)
+                .orElse(null);
+    }
+
+    public PlanejamentoAlocacaoResponseDTO atualizar(int id, PlanejamentoAlocacaoRequestDTO requestDTO) {
+        return planejamentoRepository.findById(id).map(planejamentoExistente -> {
+            Usuario usuario = usuarioRepository.findById(requestDTO.getUsuarioId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!"));
+            Ambiente ambiente = ambienteRepository.findById(requestDTO.getAmbienteId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ambiente não encontrado!"));
+
+            modelMapper.map(requestDTO, planejamentoExistente);
+            planejamentoExistente.setUsuario(usuario);
+            planejamentoExistente.setAmbiente(ambiente);
+
+            PlanejamentoAlocacao planejamentoSalvo = planejamentoRepository.save(planejamentoExistente);
+            return convertToDto(planejamentoSalvo);
+        }).orElse(null);
+    }
+
+    public boolean deletar(int id) {
+        if (planejamentoRepository.existsById(id)) {
+            planejamentoRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
     private PlanejamentoAlocacaoResponseDTO convertToDto(PlanejamentoAlocacao planejamento) {
         PlanejamentoAlocacaoResponseDTO dto = modelMapper.map(planejamento, PlanejamentoAlocacaoResponseDTO.class);
         dto.setNomeUsuario(planejamento.getUsuario().getNome());
-        dto.setDescricaoAmbiente(planejamento.getAmbiente().getDescricao());
         return dto;
     }
 }

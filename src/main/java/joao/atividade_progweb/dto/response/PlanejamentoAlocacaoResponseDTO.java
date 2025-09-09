@@ -7,7 +7,6 @@ public class PlanejamentoAlocacaoResponseDTO {
     private String observacao;
     private LocalDate data;
     private String nomeUsuario;
-    private String descricaoAmbiente;
 
     public Integer getId() {
         return id;
@@ -39,13 +38,5 @@ public class PlanejamentoAlocacaoResponseDTO {
 
     public void setNomeUsuario(String nomeUsuario) {
         this.nomeUsuario = nomeUsuario;
-    }
-
-    public String getDescricaoAmbiente() {
-        return descricaoAmbiente;
-    }
-
-    public void setDescricaoAmbiente(String descricaoAmbiente) {
-        this.descricaoAmbiente = descricaoAmbiente;
     }
 }

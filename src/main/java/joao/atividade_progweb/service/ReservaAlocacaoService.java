@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservaAlocacaoService {
@@ -28,6 +29,21 @@ public class ReservaAlocacaoService {
         this.usuarioRepository = usuarioRepository;
         this.ambienteRepository = ambienteRepository;
         this.modelMapper = modelMapper;
+    }
+
+    public List<ReservaAlocacao> listarTodas() {
+        return reservaRepository.findAll();
+    }
+
+    public List<ReservaAlocacaoResponseDTO> listarPorUsuario(Integer usuarioId) {
+        List<ReservaAlocacao> reservas = reservaRepository.findByUsuarioId(usuarioId);
+        return reservas.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<ReservaAlocacao> listarPorAmbiente(Integer ambienteId) {
+        return reservaRepository.findByAmbienteId(ambienteId);
     }
 
     public ReservaAlocacaoResponseDTO salvar(ReservaAlocacaoRequestDTO requestDTO) {
@@ -45,6 +61,32 @@ public class ReservaAlocacaoService {
 
         ReservaAlocacao reservaSalva = reservaRepository.save(reserva);
         return convertToDto(reservaSalva);
+    }
+
+    public ReservaAlocacaoResponseDTO atualizar(int id, ReservaAlocacaoRequestDTO requestDTO) {
+        validarConflito(requestDTO, id);
+
+        return reservaRepository.findById(id).map(reservaExistente -> {
+            Usuario usuario = usuarioRepository.findById(requestDTO.getUsuarioId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!"));
+            Ambiente ambiente = ambienteRepository.findById(requestDTO.getAmbienteId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ambiente não encontrado!"));
+
+            modelMapper.map(requestDTO, reservaExistente);
+            reservaExistente.setUsuario(usuario);
+            reservaExistente.setAmbiente(ambiente);
+
+            ReservaAlocacao reservaSalva = reservaRepository.save(reservaExistente);
+            return convertToDto(reservaSalva);
+        }).orElse(null);
+    }
+
+    public boolean deletar(int id) {
+        if (reservaRepository.existsById(id)) {
+            reservaRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
     private void validarConflito(ReservaAlocacaoRequestDTO requestDTO, int idDaReservaParaIgnorar) {
@@ -68,13 +110,4 @@ public class ReservaAlocacaoService {
         }
         return dto;
     }
-
-    public boolean deletar(int id) {
-        if (reservaRepository.existsById(id)) {
-            reservaRepository.deleteById(id);
-            return true;
-        }
-        return false;
-    }
-
 }
